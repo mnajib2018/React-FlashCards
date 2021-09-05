@@ -17,6 +17,34 @@
             td, th {
                 padding: 10px;
             }
+
+            #cardArea{
+                width: 500px;
+                height: 400px;
+                margin: auto;
+                margin-top: 80px;
+                border: 3px solid #ABB7B7;
+                border-radius: 5px;
+                position: relative;
+                overflow: hidden;
+            }
+            .card {
+                width: 500px;
+                height: 400px;
+                white-space: normal;
+                word-wrap: break-word;
+                position: absolute;
+                text-align: center;
+                font-size: 45px;
+                color: #2e0606;
+                font-family: Arial, Helvetica, sans-serif;
+                cursor: pointer;
+            }
+            .center{
+                margin: auto;
+                width: 50%;
+                padding: 10px;
+            }
         </style>
     </head>
     <body>
@@ -117,24 +145,83 @@
                     );
                 }
 
-                renderViewer(){
-                    return(
-                        <div>
-                            <h1>Card Viewer </h1>
-                            <button onClick={this.switchViewer}>Go to Card Editor</button>
-                        </div>
-                    );
+                render(){
+                    if (!this.state.showViewer)
+                        return this.renderCardEditor();
+                    else
+                        return <CardViewer cards={this.state.cards} openEditor={this.switchViewer}/>;
+                }
+            }
 
+            class CardViewer extends React.Component{
+                constructor(props){
+                    super(props);
+                    this.state = {
+                        cardIndex : 0,
+                        showFront : true
+                    }
+                }
+
+                getCard = () => {
+                    const cardsLen = this.props.cards.length;
+                    if(cardsLen <= 0 || this.state.cardIndex >= cardsLen)
+                    {
+                        return "Card Not Available."
+                    } else {
+                        const cardVal = this.state.showFront?
+                                        this.props.cards[this.state.cardIndex][0]:
+                                        this.props.cards[this.state.cardIndex][1];
+                        return cardVal;
+                    }
+                }
+
+                showOtherCardSide = () => {
+                    this.setState(state => ({
+                        showFront: !state.showFront
+                    }));
+                }
+
+                incrementCardIndex = () => {
+                    const cardsLen = this.props.cards.length;
+                    if(this.state.cardIndex < cardsLen-1 && this.state.cardIndex >= 0)
+                    {
+                        this.setState(state => ({
+                            cardIndex : state.cardIndex + 1,
+                            showFront : true
+                        }));
+                    }
+                }
+
+                decrementCardIndex = () => {
+                    const cardsLen = this.props.cards.length;
+                    if(this.state.cardIndex > 0)
+                    {
+                        this.setState(state => ({
+                            cardIndex : state.cardIndex-1,
+                            showFront : true
+                        }));
+                    }
                 }
 
                 render(){
-                    if (this.state.showViewer)
-                        return this.renderViewer();
-                    else
-                        return this.renderCardEditor();
+                    return(
+                        <div>
+                            <h1>Card Viewer </h1>
+                            <div id="cardArea">
+                                <button className="card" onClick={this.showOtherCardSide}>
+                                    {this.getCard()}
+                                </button>
+                            </div>
+                            <br/>
+                            <div className="center">
+                                <button className="center" onClick={this.decrementCardIndex}>Prev Card</button>
+                                <button className="center" onClick={this.incrementCardIndex}>Next Card</button>
+                            </div>
+                            <hr/>
+                            <button className="center" onClick={this.props.openEditor}>Go to Card Editor</button>
+                        </div>
+                    );
                 }
-
-
             }
 
             class App extends React.Component{
@@ -146,7 +233,6 @@
                     );
                 }
             }
-
 
             ReactDOM.render(<App />, document.querySelector("#app"))
         </script>
