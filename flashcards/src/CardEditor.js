@@ -1,35 +1,52 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './CardEditor.css';
+import CardTable from './CardTable';
 
-class CardTable extends React.Component{
+const CardEditor = (props) => {
+    const [inputFront, setInputFront] = useState("");
+    const [inputBack, setInputBack] = useState("");
 
-    render(){
-        const cardList = this.props.cards.map((card, index) => 
-            <tr key={index}>
-                <td>{card[0]} </td>
-                <td>{card[1]}</td>
-                <td><button onClick={() => this.props.handleDeleteClick(index)}>Delete</button></td>
-            </tr>
-            ); 
-        return (
-            <table>
-                <thead>
-                    <tr>
-                        <th>Front</th>
-                        <th>Back</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {cardList}
-                </tbody>
-            </table>
-        );
+    const updateCardFront = (event) => {
+        setInputFront(event.target.value);
     }
+
+    const updateCardBack = (event) => {
+        setInputBack(event.target.value);
+    }
+
+    const addCard = () => {
+        props.addCard(inputFront, inputBack);
+        setInputFront("");
+        setInputBack("");
+    }
+
+    const removeCard =(index) => {
+        props.removeCard(index);
+    }
+
+    const switchViewer = () => {
+        props.switchViewer();
+    }
+
+    return( 
+        <div>
+            <h1>Card Editor</h1>
+            <CardTable cards={props.cards} handleDeleteClick={removeCard} />
+            <br/>
+            <input placeholder="Front of Card" value={inputFront} onChange={updateCardFront} />
+            <input placeholder="Back of Card" value={inputBack} onChange={updateCardBack}/>
+            <button onClick={addCard}>Add Card</button>
+            <hr/>
+            <button onClick={switchViewer}>Go to Viewer</button>
+        </div>
+    );
 
 }
 
-class CardEditor extends React.Component{
+export default CardEditor;
+
+
+/*class CardEditor extends React.Component{
     constructor(props){
         super(props);
         this.state = {
@@ -101,76 +118,4 @@ class CardEditor extends React.Component{
         else
             return <CardViewer cards={this.state.cards} openEditor={this.switchViewer}/>;
     }
-}
-
-class CardViewer extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            cardIndex : 0,
-            showFront : true
-        }
-    }
-
-    getCard = () => {
-        const cardsLen = this.props.cards.length;
-        if(cardsLen <= 0 || this.state.cardIndex >= cardsLen)
-        {
-            return "Card Not Available."
-        } else {
-            const cardVal = this.state.showFront?
-                            this.props.cards[this.state.cardIndex][0]:
-                            this.props.cards[this.state.cardIndex][1];
-            return cardVal;
-        }
-    }
-
-    showOtherCardSide = () => {
-        this.setState(state => ({
-            showFront: !state.showFront
-        }));
-    }
-
-    incrementCardIndex = () => {
-        const cardsLen = this.props.cards.length;
-        if(this.state.cardIndex < cardsLen-1 && this.state.cardIndex >= 0)
-        {
-            this.setState(state => ({
-                cardIndex : state.cardIndex + 1,
-                showFront : true
-            }));
-        }
-    }
-
-    decrementCardIndex = () => {
-        if(this.state.cardIndex > 0)
-        {
-            this.setState(state => ({
-                cardIndex : state.cardIndex-1,
-                showFront : true
-            }));
-        }
-    }
-
-    render(){
-        return(
-            <div>
-                <h1>Card Viewer </h1>
-                <div id="cardArea">
-                    <button className="card" onClick={this.showOtherCardSide}>
-                        {this.getCard()}
-                    </button>
-                </div>
-                <br/>
-                <div className="center">
-                    <button className="center" onClick={this.decrementCardIndex}>Prev Card</button>
-                    <button className="center" onClick={this.incrementCardIndex}>Next Card</button>
-                </div>
-                <hr/>
-                <button className="center" onClick={this.props.openEditor}>Go to Card Editor</button>
-            </div>
-        );
-    }
-}
-
-export default CardEditor;
+}*/
